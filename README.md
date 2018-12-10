@@ -9,11 +9,13 @@ This document is written base on:
 - CiViCRM (4.6.34)
 - Nginx (nginx/1.12.2)
 
-Here is follow of our site:
+**Here is follow of our site:**
 
+```
 users --> https://tasks.rivieu.com/ --> Nginx --> PHP-FPM --> Drupal/CiviCRM --> MySQL
+```
 
-Here is the documents that I have references:
+**Here is the documents that I have reference:**
 - Prepare environment and dependecies: 
 https://www.hostinger.com/tutorials/how-to-install-lemp-centos7#gref
 https://www.rosehosting.com/blog/how-to-install-drupal-7-on-centos-7-with-nginx-mariadb-and-php-fpm/
