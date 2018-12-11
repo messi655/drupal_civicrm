@@ -145,12 +145,21 @@ server {
 ``` 
 
 **Restart Nginx Server:** 
-```sudo systemctl restart nginx```
+
+```
+sudo systemctl restart nginx
+```
 
 **Configure PHP-FPM**
+
 - Open PHP-FPM configuration:
-```sudo vi /etc/php-fpm.d/www.conf```
+
+```
+sudo vi /etc/php-fpm.d/www.conf
+```
+
 Find and replace these lines:
+
 ```
 user = apache to user = nginx
 group = apache to group = nginx
@@ -158,25 +167,41 @@ listen.owner = nobody to listen.owner = nginx
 listen.group = nobody to listen.group = nginx
 listen.mode = 0660
 ```
+
 **Restart PHP-FPM and enable it:**
+
 ```
 sudo systemctl start php-fpm
 sudo systemctl enable php-fpm
 ```
+
 **Open browse and access:**
-```http://your_domain``` and follow the guide steps to finish install Drupal
+
+```
+http://your_domain
+``` 
+and follow the guide steps to finish install Drupal
 
 # Enable HTTPS for Drupal site
 
 We will use free SSL/TLS certificates from Let’s Encrypt (https://letsencrypt.org/)
 
 - Download Let’s Encrypt Client (I use git to clone letsencrypt)
-```sudo git clone https://github.com/certbot/certbot /opt/letsencrypt```
+
+```
+sudo git clone https://github.com/certbot/certbot /opt/letsencrypt
+```
+
 - Create temporary folder for the let’s encrypt temporary file
-```sudo mkdir -p /usr/share/letsencrypt/```
+
+```
+sudo mkdir -p /usr/share/letsencrypt/
+```
+
 - Create a file that use as a pattern for Cert /etc/letsencrypt/configs/tinhuynh.test.co
 
 With the content of tinhuynh.test.co:
+
 ```
 domains = tasks.rivieu.com
 rsa-key-size = 2048 # Or 4096
@@ -186,14 +211,24 @@ text = True
 authenticator = webroot
 webroot-path = /usr/share/letsencrypt/
 ```
+
 - Request the Certificate
 - Change to /opt/letsencrypt folder
 - Run cert request:
-```./certbot-auto --config /etc/letsencrypt/configs/tinhuynh.test.co certonly```
+
+```
+./certbot-auto --config /etc/letsencrypt/configs/tinhuynh.test.co certonly
+```
 **Enable HTTPS**
+
 - Create a nginx configure for https
-```sudo touch /etc/nginx/conf.d/drupal_https.conf```
+
+```
+sudo touch /etc/nginx/conf.d/drupal_https.conf
+```
+
 - Paste the contents below to drupal_https.conf
+
 ```
 server {
     server_name tasks.rivieu.com;
@@ -228,29 +263,43 @@ server {
   }
 }
 ```
+
 **Restart nginx:**
-```sudo systemctl restart nginx```
+
+```
+sudo systemctl restart nginx
+```
 
 **Open browse and access:**
-```https://your_domain```
+
+```
+https://your_domain
+```
 
 # Install CiViCRM
 
 - Download civicrm modules and extract to folder /usr/share/drupal/sites/all/modules/civicrm
+
 **Install by Run the Installer**
+
 - Login to Drupal site with Administrator 
 - Point your web browse to `http://your_domain/sites/all/modules/civicrm/install/index.php`
+
 **Follow the guide steps to finish Install CiViCRM (Note: Make sure you enter different the database information of Drupal and CiViCRM that you create above).**
 
 # Backup
 - Create a script for backup `sudo vi /usr/share/scripts/script.sh`
+
 ```
 #!/bin/bash
 getDate=$(date +%Y-%m-%d)
 tar -czvf /backup/drupal-”$getDate”.tar.gz /usr/share/drupal
 ```
+
 - Set crontab for backup 
+
 ***add below lines to end of crontab file `sudo vi /etc/crontab`***
+
 ```
 #Daily backup
 00 00 * * * /usr/share/scripts/script.sh
@@ -259,9 +308,17 @@ tar -czvf /backup/drupal-”$getDate”.tar.gz /usr/share/drupal
 #Monthly backup (on 29)
 00 02 29 * * /usr/share/scripts/script.sh
 ```
+
 # Auto Renew let’s encrypt Certificate
-- Create a script and set execute permission for it: ```sudo vi /usr/share/scripts/certRenew.sh```
+
+- Create a script and set execute permission for it: 
+
+```
+sudo vi /usr/share/scripts/certRenew.sh
+```
+
 **add the contents below to certRenew.sh file**
+
 ```
 #!/bin/sh
 cd /opt/letsencrypt/
@@ -275,8 +332,11 @@ if [ $? -ne 0 ]
 fi
 exit 0
 ```
+
 - Set crontab for auto renew: 
+
 ***add below lines to end of crontab file `sudo vi /etc/crontab`***
+
 ```
 # Auto Renew every 2 month
 0 0 1 JAN,MAR,MAY,JUL,SEP,NOV * /usr/share/scripts/certRenew.sh
