@@ -1,0 +1,7 @@
+domains = {{ domain }}
+rsa-key-size = 2048 # Or 4096
+server = https://acme-v01.api.letsencrypt.org/directory
+email = {{ email_admin }}
+text = True
+authenticator = webroot
+webroot-path = /usr/share/letsencrypt/

@@ -1,0 +1,2 @@
+[drupal]
+tasks.rivieu.com ansible_ssh_host=54.67.108.200

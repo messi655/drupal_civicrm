@@ -1,0 +1,63 @@
+---
+- name: Install EPEL Repo
+  yum: name=epel-release state=present
+
+- name: Install remi repo
+  yum: name=http://rpms.remirepo.net/enterprise/remi-release-7.rpm state=present
+
+- name: Install yum-utils
+  yum: name=yum-utils state=present
+
+- name: Enable remi repo
+  shell: sudo yum-config-manager --enable remi-php56
+
+- name: Install PHP package
+  shell: sudo yum --enablerepo=remi,remi-php56 install php-fpm php-common -y
+
+- name: Install PHP modules
+  shell: sudo yum --enablerepo=remi,remi-php56 install php-opcache php-pecl-apcu php-cli php-pear php-pdo php-mysqlnd php-pgsql php-pecl-mongodb php-pecl-redis php-pecl-memcache php-pecl-memcached php-gd php-mbstring php-mcrypt php-xml -y
+
+- name: Install Drush
+  yum: name=drush state=present
+
+- name: Configure php-fpm user
+  replace:
+    path: /etc/php-fpm.d/www.conf
+    regexp: 'user = apache'
+    replace: 'user = nginx'
+    backup: yes
+
+- name: Configure php-fpm group
+  replace:
+    path: /etc/php-fpm.d/www.conf
+    regexp: 'group = apache'
+    replace: 'group = nginx'
+    backup: yes
+
+- name: Configure php-fpm group
+  replace:
+    path: /etc/php-fpm.d/www.conf
+    regexp: ';listen.owner = nobody'
+    replace: 'listen.owner = nginx'
+    backup: yes
+
+- name: Configure php-fpm group
+  replace:
+    path: /etc/php-fpm.d/www.conf
+    regexp: ';listen.group = nobody'
+    replace: 'listen.group = nginx'
+    backup: yes
+
+- name: Configure php-fpm group
+  replace:
+    path: /etc/php-fpm.d/www.conf
+    regexp: ';listen.mode = 0660'
+    replace: 'listen.mode = 0660'
+    backup: yes
+
+- name: Install mysql Repo
+  yum: name=https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm state=present
+
+- name: Install Mysql community server
+  yum: name=mysql-community-server state=present
+  

@@ -1,0 +1,47 @@
+---
+- name: Install git client
+  yum: name=git state=present
+
+- name: Download let encrypt
+  shell: sudo git clone https://github.com/certbot/certbot /opt/letsencrypt
+  ignore_errors: yes
+
+- name: Create temporary for lets encrypt
+  file: path=/usr/share/letsencrypt/ state=directory
+
+- name: Set permission of this folder
+  command: chown nginx:nginx /usr/share/letsencrypt
+
+- name: Create lets encrypt config
+  file: path=/etc/letsencrypt/ state=directory
+
+- name: Create lets encrypt config
+  file: path=/etc/letsencrypt/configs/ state=directory
+
+- name: Copy cert template
+  template: src=cert_template.j2 dest=/etc/letsencrypt/configs/cert_template
+
+- name: Create cert
+  shell: /opt/letsencrypt/certbot-auto --non-interactive --agree-tos --config /etc/letsencrypt/configs/cert_template certonly
+
+- name: Download drupal source code
+  get_url:
+    url: "{{ drupal_url }}"
+    dest: "/tmp/{{ drupal_archive }}"
+
+- name: Unarchive MySQL JDBC Connector package
+  shell: |
+    TMP_DIR=`mktemp -d`
+    tar zxvf /tmp/{{ drupal_archive }} -C $TMP_DIR --strip-components=1
+    sudo cp -r $TMP_DIR/* {{ document_root }}/
+    sudo chmod -R 750 {{ document_root }}
+    sudo chown -R nginx:nginx {{ document_root }}
+
+- name: Create drupal https
+  template: src=drupal_https.conf.j2 dest=/etc/nginx/conf.d/drupal_https.conf
+  
+- name: restart php-fpm
+  command: sudo systemctl restart php-fpm
+
+- name: restart nginx
+  command: sudo systemctl restart nginx

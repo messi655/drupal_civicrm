@@ -1,0 +1,42 @@
+---
+- name: Install EPEL Repo
+  yum: name=epel-release state=present
+
+- name: Update packages
+  shell: yum update -y
+
+- name: Install wget
+  yum: name=wget state=present
+
+- name: Install Nginx
+  yum: name=nginx state=present
+
+- name: Update /etc/nginx/nginx.conf
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+- name: Create drupal http
+  template: src=drupal_http.conf.j2 dest=/etc/nginx/conf.d/drupal_http.conf
+
+- name: Create document root
+  file: path={{ document_root }} state=directory 
+
+- name: Create temporary folder for let encrypt
+  file: path={{ document_root }}/.well-known state=directory
+
+- name: Create temporary folder for let encrypt
+  file: path={{ document_root }}/.well-known/acme-challenge state=directory
+
+- name: Create temporary file in document root
+  file: path={{ document_root }}/test.html state=touch owner=nginx group=nginx
+
+- name: Start PHP FPM
+  command: sudo systemctl start php-fpm
+
+- name: Make sure it enbale
+  command: sudo systemctl enable php-fpm
+
+- name: Restart Nginx
+  command: sudo systemctl start nginx
+
+- name: Enable Nginx at started
+  command: sudo systemctl enable nginx
