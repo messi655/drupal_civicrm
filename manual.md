@@ -79,14 +79,19 @@ https://www.rosehosting.com/blog/how-to-install-drupal-7-on-centos-7-with-nginx-
 ```sudo mkdir -p /usr/share/drupal```
 
 - Create temporary folder for let's encrypt
+
 ```sudo mkdir -p /usr/share/drupal/.well-known/acme-challenge```
+
 - Set permission of document root folder:
+
 ```sudo chmod 750 /usr/share/drupal```
 
 ```sudo chown -R nginx:nginx /usr/share/drupal```
 
 **Configure Nginx:**
+
 - Create a nginx configure for drupal
+
 ```sudo touch /etc/nginx/conf.d/drupal.conf```
 
 Paste the content below to drupal.conf
